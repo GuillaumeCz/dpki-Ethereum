@@ -1,0 +1,20 @@
+{
+  "name": "dpki-poc",
+  "version": "1.0.0",
+  "description": "",
+  "main": "truffle-config.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "commander": "^2.15.1",
+    "fs": "0.0.1-security",
+    "truffle-contract": "^3.0.5",
+    "web3": "^1.0.0-beta.34"
+  }
+}
