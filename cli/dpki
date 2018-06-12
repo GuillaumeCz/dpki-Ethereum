@@ -1,5 +1,6 @@
 var program = require('commander');
 var keyUtils = require('./keys');
+var storageUtils = require('./storage');
 
 program
 	.version('0.1.0')
@@ -16,6 +17,10 @@ program
 	.command('key-of <name>').alias('key')
 	.option('-f, --file [filePath]', 'The target file to export to')
 	.action(keyUtils.keyOf);
+
+program
+	.command('save <address> <name>')
+	.action(storageUtils.saveRecord);
 
 /*
 	program

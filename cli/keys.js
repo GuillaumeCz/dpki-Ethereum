@@ -32,7 +32,6 @@ exports.myKey = function() {
 }
 
 exports.keyOf = function(_name, _options) {
-	console.log(_options.file)
 	const dpki = contract(DpkiContract);
 	dpki.setProvider(web3.currentProvider);
 	if(typeof dpki.currentProvider.sendAsync !== "function") {
@@ -45,17 +44,17 @@ exports.keyOf = function(_name, _options) {
 	}
 
 	dpki.deployed().then(function(instance) {
+	const dpki = contract(DpkiContract);
 		return instance.getKey.call(_name);
 	}).then(function(key) {
-		if(typeof _options.file !== "undefined") {
+		console.log(key);
+		if(typeof _options !== "undefined" && typeof _options.file !== "undefined") {
 			fs.writeFile(_options.file, key, function(err) {
 				if(err) {
 					return console.log(err);	
 				}
 				console.log('Saved !')	
 			})
-		} else {
-			console.log(key);
 		}
 	})
 };
