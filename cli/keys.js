@@ -2,6 +2,8 @@ var fs = require('fs');
 var contract = require('truffle-contract');
 var Web3 = require('web3');
 
+var ipfs = require('../ipfs');
+
 var DpkiContract = require('../build/contracts/Dpki.json');
 var web3 = new Web3('http://127.0.0.1:8545');
 
@@ -27,8 +29,11 @@ exports.myKey = function() {
 		return instance.getMyKey.call();
 	}).then(function(_myKey) {
 		Object.assign(_myInfos, { key: _myKey});
-		console.log(_myInfos);
-	})
+    return ipfs.cat(_myKey);
+	}).then((_value) => {
+      Object.assign(_myInfos, { value: _value });
+		    console.log(_myInfos);
+  });
 }
 
 exports.keyOf = function(_name, _options) {
@@ -60,12 +65,8 @@ exports.keyOf = function(_name, _options) {
 };
 
 exports.newKey = function(_keyPath) {
-	fs.readFile('./'+_keyPath, 'utf8', function(err, data) {
-		if(err) {
-			return console.log(err);
-		}
-		
-		const key = data;
+    ipfs.saveFile(_keyPath).then((id) => {
+    
 		const dpki = contract(DpkiContract);
 		dpki.setProvider(web3.currentProvider);
 
@@ -86,12 +87,12 @@ exports.newKey = function(_keyPath) {
 					from: accounts[0],
 					gas: 1700000
 				};
-				return dpkiInstance.registerKey.sendTransaction(data, params);
+				return dpkiInstance.registerKey.sendTransaction(id, params);
 			}).then(function() {
 				return dpkiInstance.getMyKey.call();
 			}).catch(function(err) {
 				console.log(err)
 			})
-		})
-	})
+    });
+	});
 }

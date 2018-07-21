@@ -1,39 +1,44 @@
-const ipfsAPI = require('ipfs-api');
 const keysUtils = require('./keys');
-const Buffer = require('buffer/').Buffer;
-const fs = require('fs');
+const Web3 = require('web3');
+const contract = require('truffle-contract');
 
-var ipfs = ipfsAPI('localhost', '5001', { protocol: 'http' });
-
-ipfs.files.cat('Qmek5zLNuAyjgtUnki51BZrxCoMzyVFTbrrzsHTMuMZz7H').then(function(res) {
-	const json = JSON.parse(res.toString('utf8'));
-//	console.log(json.hello.Hell);
-})
+const StoragePkContract = require('../build/contracts/StoragePk.json');
+const web3 = new Web3('http://127.0.0.1:8545');
 
 exports.saveRecord = function(_address, _name) {
-	//console.log(_address, _name)
+	const storagePk = contract(StoragePkContract);
 	const key = keysUtils.keyOf(_address);
-	const obj_ = {
-		name: _name,
-		address: _address,
-		key: key
-	};
 
-	fs.writeFile('./v.json', JSON.stringify(obj_), function(err) {
-		if (err) 
-			console.log(err)
-	})
+	storagePk.setProvider(web3.currentProvider);
+	if(typeof storagePk.currentProvider.sendAsync !== "function") {
+		storagePk.currentProvider.sendAsync = function() {
+			return storagePk.currentProvider.send.apply(
+				storagePk.currentProvider,
+				arguments
+			);
+		}
+	}
+	web3.eth.getAccounts()
+		.then(accounts => storagePk.deployed())
+		.then(instance => instance.addRecord(_name, key, { from: accounts[0] }));
+}
 
-	const f = [{
-		path: './v.json'
-	}]
-	const uri = '/guizy/'+_name;
+exports.fetchRecord = function(_name) {
+	const storagePk = contract(StoragePkContract);
 
-	var id;
-	ipfs.files.add(f, function(err, data) {
-		if (err)
-			console.log(err)
-		else
-			console.log(data[1].hash)
-	})
+	storagePk.setProvider(web3.currentProvider);
+	if(typeof storagePk.currentProvider.sendAsync !== "function") {
+		storagePk.currentProvider.sendAsync = function() {
+			return storagePk.currentProvider.send.apply(
+				storagePk.currentProvider,
+				arguments
+			);
+		}
+	}
+
+	storagePk.deployed()
+		.then(instance => instance.getRecordKey(_name))
+		.then(res => {
+			console.log(_name, res);
+		})
 }
