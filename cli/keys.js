@@ -9,90 +9,61 @@ var web3 = new Web3('http://127.0.0.1:8545');
 
 var exports = module.exports = {};
 
-exports.myKey = function() {
-	const dpki = contract(DpkiContract);
-	let _myInfos = {};
-
-	dpki.setProvider(web3.currentProvider);
-	if(typeof dpki.currentProvider.sendAsync !== "function") {
-		dpki.currentProvider.sendAsync = function() {
-			return dpki.currentProvider.send.apply(
-				dpki.currentProvider,
-				arguments
-			);
-		}
-	}
-	web3.eth.getAccounts().then(function(accounts) {
-		_myInfos.address = accounts[0];	
-		return dpki.deployed();
-	}).then(function(instance) {
-		return instance.getMyKey.call();
-	}).then(function(_myKey) {
-		Object.assign(_myInfos, { key: _myKey});
-    return ipfs.cat(_myKey);
-	}).then((_value) => {
-      Object.assign(_myInfos, { value: _value });
-		    console.log(_myInfos);
-  });
-}
-
-exports.keyOf = function(_name, _options) {
-	const dpki = contract(DpkiContract);
-	dpki.setProvider(web3.currentProvider);
-	if(typeof dpki.currentProvider.sendAsync !== "function") {
-		dpki.currentProvider.sendAsync = function() {
-			return dpki.currentProvider.send.apply(
-				dpki.currentProvider,
-				arguments
-			);
-		}
-	}
-
-	dpki.deployed().then(function(instance) {
-	const dpki = contract(DpkiContract);
-		return instance.getKey.call(_name);
-	}).then(function(key) {
-		console.log(key);
-		if(typeof _options !== "undefined" && typeof _options.file !== "undefined") {
-			fs.writeFile(_options.file, key, function(err) {
-				if(err) {
-					return console.log(err);	
-				}
-				console.log('Saved !')	
-			})
-		}
-	})
+// Returns the key address of a name
+exports.keyAddressOf = function(_name, _options) {
+    const dpki = connect();
+    getAccount().then(account => {
+        const params = getParameters(account);
+        dpki.deployed().then(instance => {
+            return instance.getKeyAddressFromName.call(_name, params);
+        }).then(key => {
+            console.log(key);
+        });
+    });
 };
 
-exports.newKey = function(_keyPath) {
-    ipfs.saveFile(_keyPath).then((id) => {
-    
-		const dpki = contract(DpkiContract);
-		dpki.setProvider(web3.currentProvider);
-
-		if(typeof dpki.currentProvider.sendAsync !== "function") {
-			dpki.currentProvider.sendAsync = function() {
-				return dpki.currentProvider.send.apply(
-					dpki.currentProvider,
-					arguments
-				);
-			}
-		}
-
-		web3.eth.getAccounts().then(function(accounts) {
-			let dpkiInstance;
-			dpki.deployed().then(function(instance) {
-				dpkiInstance = instance;
-				const params = {
-					from: accounts[0],
-					gas: 1700000
-				};
-				return dpkiInstance.registerKey.sendTransaction(id, params);
-			}).then(function() {
-				return dpkiInstance.getMyKey.call();
-			}).catch(function(err) {
-				console.log(err)
-			})
+// Add a new name associated to an ipfs address of a public key 
+exports.newKeyAddress = function(_name,_keyPath, _cmd) {
+    const dpki = connect();
+    getAccount().then(account => {
+        const params = getParameters(account);
+        dpki.deployed().then(instance => {
+            dpkiInstance = instance;
+            // if a file is specified: save the content to ipfs and store the address into the ledger
+            if(_cmd.file) {
+                ipfs.saveFile(_keyPath).then((id) => {
+			              return dpkiInstance.registerKeyAddress.sendTransaction(_name, id, params);
+	              });
+            } else {
+			          return dpkiInstance.registerKeyAddress.sendTransaction(_name, _keyPath, params);
+            }
+       }).then(() => dpkiInstance.getKeyAddressFromName.call(_name)).then(res => {
+           console.log(_name, '==>', res);
+       });
     });
-	});
 }
+
+function getAccount() {
+    return new Promise((resolve, reject) => {
+        web3.eth.getAccounts().then(accounts => {
+            resolve(accounts[0]);
+        })
+    });
+}
+
+function getParameters(_account) {
+    return { from: _account, gas: 1700000 };
+}
+
+function connect() {
+    const dpki = contract(DpkiContract);
+    dpki.setProvider(web3.currentProvider);
+
+     // Needed or it will crash...
+     if(typeof dpki.currentProvider.sendAsync !== "function") {
+         dpki.currentProvider.sendAsync = function() {
+             dpki.currentProvider.send.apply(dpki.currentProvider,arguments);
+         }
+     }
+    return dpki;
+};
