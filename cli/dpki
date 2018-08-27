@@ -1,27 +1,24 @@
 var program = require('commander');
 var keyUtils = require('./keys');
-var storageUtils = require('./storage');
 var ipfs = require('./ipfs');
 
 program
 	.version('0.1.0')
 
-program
-	.command('new-key <path>').alias('new')
-	.action(keyUtils.newKey);
+/** ETHEREUM */
 
+// Saves a new association between a name and an ipfs address corresponding to a public key value
 program
-	.command('my-key').alias('me')
-	.action(keyUtils.myKey);
+	.command('new-key <_name> <_keyPath>').alias('new')
+  .option('-f, --file', 'Explicit file path, not ipfs id')
+	.action(keyUtils.newKeyAddress);
 
+// Get the ipfs key address of a name
 program
-	.command('key-of <name>').alias('key')
-	.option('-f, --file [filePath]', 'The target file to export to')
-	.action(keyUtils.keyOf);
+	.command('key-of <_name>').alias('key')
+	.action(keyUtils.keyAddressOf);
 
-program
-	.command('save <address> <name>')
-	.action(storageUtils.saveRecord);
+/**  IPFS  */
 
 // Display the value of the file with the requested id
 program
