@@ -3,33 +3,25 @@ pragma solidity ^0.4.23;
 contract Dpki {
 	uint256 recordCount = 0;
 
-	mapping(address => string) private addressToKey;
-	mapping(string => address) private keyToAddress;
+	mapping(string => string) private nameToKeyAddress;
+	mapping(string => string) private keyAddressToName;
 
-	mapping(uint256 => KeyAddressRecord) private indexKeyAddressRecord;
+	mapping(uint256 => KeyAddressNameRecord) private indexKeyAddressNameRecord;
 
-	struct KeyAddressRecord {
-		address ownerAddress;
-		string key;
+	struct KeyAddressNameRecord {
+		string keyAddress;
+		string name;
 	}
 
-	function registerKey(string _key) public {
-		require(bytes(_key).length != 0);
-		addressToKey[msg.sender] = _key;
-		keyToAddress[_key] = msg.sender;
-		indexKeyAddressRecord[recordCount] = KeyAddressRecord(msg.sender, _key);
+	function registerKeyAddress(string _name, string _keyAddress) public {
+		require(bytes(_keyAddress).length != 0);
+		nameToKeyAddress[_name] = _keyAddress;
+		keyAddressToName[_keyAddress] = _name;
+		indexKeyAddressNameRecord[recordCount] = KeyAddressNameRecord(_keyAddress, _name);
 		recordCount++;
 	}
 
-	function getKey(address _ownerAddress) public view returns (string) {
-		return addressToKey[_ownerAddress];
-	}
-
-	function getMyKey() public view returns (string) {
-		return addressToKey[msg.sender];
-	}
-
-	function getAddress(string _key) public view returns (address) {
-		return keyToAddress[_key];	
-	}
+  function getKeyAddressFromName(string _name) public view returns (string) {
+    return nameToKeyAddress[_name];
+  }
 }
