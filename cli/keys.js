@@ -2,7 +2,7 @@ var fs = require('fs');
 var contract = require('truffle-contract');
 var Web3 = require('web3');
 
-var ipfs = require('../ipfs');
+var ipfs = require('./ipfs');
 
 var DpkiContract = require('../build/contracts/Dpki.json');
 var web3 = new Web3('http://127.0.0.1:8545');

@@ -1,7 +1,7 @@
 var program = require('commander');
 var keyUtils = require('./keys');
 var storageUtils = require('./storage');
-var ipfs = require('./../ipfs');
+var ipfs = require('./ipfs');
 
 program
 	.version('0.1.0')
@@ -23,10 +23,12 @@ program
 	.command('save <address> <name>')
 	.action(storageUtils.saveRecord);
 
+// Display the value of the file with the requested id
 program
   .command('ipfs-cat <id>')
   .action(ipfs.cat);
 
+// Save a file in ipfs
 program
   .command('ipfs-save <path>')
   .action(ipfs.saveFile);
