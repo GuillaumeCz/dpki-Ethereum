@@ -1,2 +1,2 @@
 ## Todo
-Variables globales dans fichier de config
+Variables globales dans fichier de config (DOTENV)
