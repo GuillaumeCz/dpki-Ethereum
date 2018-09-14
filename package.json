@@ -7,7 +7,10 @@
     "test": "test"
   },
   "scripts": {
-    "test": "jest"
+    "test": "jest",
+    "ganache": "ganache-cli  -m 'candy maple cake sugar pudding cream honey rich smooth crumble sweet treat'",
+    "ipfs": "ipfs daemon",
+    "dev": "concurrently --kill-others \"npm run ganache\" \"npm run ipfs\""
   },
   "jest": {
     "rootDir": "cli/test"
@@ -22,6 +25,7 @@
     "web3": "^1.0.0-beta.34"
   },
   "devDependencies": {
+    "concurrently": "^4.0.1",
     "jest": "^23.5.0"
   }
 }
