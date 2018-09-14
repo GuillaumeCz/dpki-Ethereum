@@ -7,7 +7,10 @@
     "test": "test"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "jest"
+  },
+  "jest": {
+    "rootDir": "cli/test"
   },
   "author": "",
   "license": "ISC",
@@ -15,8 +18,10 @@
     "commander": "^2.15.1",
     "fs": "0.0.1-security",
     "ipfs-api": "^22.0.1",
-    "mongodb": "^3.0.10",
     "truffle-contract": "^3.0.5",
     "web3": "^1.0.0-beta.34"
+  },
+  "devDependencies": {
+    "jest": "^23.5.0"
   }
 }
