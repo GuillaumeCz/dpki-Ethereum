@@ -11,9 +11,6 @@ var exports = module.exports = {};
 exports.cat = function(_fileIpfsId) {
     return new Promise((resolve, reject) => {
         ipfs.files.cat(_fileIpfsId).then(res => {
-            // Next line should be removed...
-            // Don't know why the resolve don't print it to the console
-            console.log(res.toString())
             resolve(res.toString());
         }).catch(err => {
             reject(err);
@@ -30,6 +27,8 @@ exports.saveFile = function(_filePath) {
         const playload = { path: '/cli/assets/id_rsa.pub', content: data };
         ipfs.files.add(playload).then(r => {
             resolve(r[0].hash);
+        }).catch(err => {
+            reject(err);
         });
     })
 };

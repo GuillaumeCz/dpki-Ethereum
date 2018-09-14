@@ -10,36 +10,61 @@ var web3 = new Web3('http://127.0.0.1:8545');
 var exports = module.exports = {};
 
 // Returns the key address of a name
-exports.keyAddressOf = function(_name, _options) {
-    const dpki = connect();
-    getAccount().then(account => {
-        const params = getParameters(account);
-        dpki.deployed().then(instance => {
-            return instance.getKeyAddressFromName.call(_name, params);
-        }).then(key => {
-            console.log(key);
-        });
+exports.keyAddressOf = function(_name) {
+    return new Promise((resolve, reject) => {
+        const dpki = connect();
+        getAccount().then(account => {
+            const params = getParameters(account);
+            dpki.deployed().then(instance => {
+                return instance.getKeyAddressFromName.call(_name, params);
+            }).then(key => {
+                resolve(key);
+            }).catch(err => {
+                reject(err);
+            });
+        }); 
     });
+    
 };
 
+exports.keyAddrOf = function(_name) {
+    return new Promise((resolve, reject) => {
+        const dpki = connect();
+        getAccount().then(account => {
+            const params = getParameters(account);
+            dpki.deployed().then(instance => {
+                return instance.getKeyAddressFromName.call(_name, params);
+            }).then(key => {
+                resolve(key);
+            }).catch(err => {
+                reject(err)
+            })
+        });
+    });
+}
 // Add a new name associated to an ipfs address of a public key 
-exports.newKeyAddress = function(_name,_keyPath, _cmd) {
-    const dpki = connect();
-    getAccount().then(account => {
-        const params = getParameters(account);
-        dpki.deployed().then(instance => {
-            dpkiInstance = instance;
-            // if a file is specified: save the content to ipfs and store the address into the ledger
-            if(_cmd.file) {
-                ipfs.saveFile(_keyPath).then((id) => {
-			              return dpkiInstance.registerKeyAddress.sendTransaction(_name, id, params);
-	              });
-            } else {
-			          return dpkiInstance.registerKeyAddress.sendTransaction(_name, _keyPath, params);
-            }
-       }).then(() => dpkiInstance.getKeyAddressFromName.call(_name)).then(res => {
-           console.log(_name, '==>', res);
-       });
+exports.newKeyAddress = function(_name, _idOrKeyPath, _cmd) {
+    return new Promise((resolve, reject) => {
+        const dpki = connect();
+        getAccount().then(account => {
+            const params = getParameters(account);
+            dpki.deployed().then(instance => {
+                dpkiInstance = instance;
+                // if a file is specified: save the content to ipfs and store the address into the ledger
+                if(_cmd.file) {
+                    const filePath = _idOrKeyPath;
+                    ipfs.saveFile(filePath).then(id => {
+			                  dpkiInstance.registerKeyAddress.sendTransaction(_name, id, params)
+                            .then(() => resolve(id));
+	                  });
+                } else {
+                    const ipfs_id = _idOrKeyPath;
+			              dpkiInstance.registerKeyAddress.sendTransaction(_name, ipfs_id, params).then(() => resolve(ipfs_id));
+                } 
+            }).catch(err => {
+                reject(err);
+            });
+        });
     });
 }
 

@@ -9,26 +9,48 @@ program
 
 // Saves a new association between a name and an ipfs address corresponding to a public key value
 program
-	.command('new-key <_name> <_keyPath>').alias('new')
+	.command('new-key <_name> <file>').alias('new')
   .option('-f, --file', 'Explicit file path, not ipfs id')
-	.action(keyUtils.newKeyAddress);
+	.action((_name, file, options) => {
+    keyUtils.newKeyAddress(_name, file, options).then(res => {
+        console.log('New Association <name> -> <ipfs_address', _name, res)
+    }).catch(err => {console.log(err)})
+  });
 
 // Get the ipfs key address of a name
 program
 	.command('key-of <_name>').alias('key')
-	.action(keyUtils.keyAddressOf);
+	.action(name => {
+    keyUtils.keyAddressOf(name).then(res => {
+        console.log('IPFS Address', res);
+    }).catch(err => {
+        console.log('---', err);
+    });
+  });
 
 /**  IPFS  */
 
 // Display the value of the file with the requested id
 program
   .command('ipfs-cat <id>')
-  .action(ipfs.cat);
+  .action(ipfs_addr => {
+      ipfs.cat(ipfs_addr).then(res => {
+          console.log('\nValue: ', res)
+      }).catch(err => {
+          console.log('---', err)
+      });
+  });
 
 // Save a file in ipfs
 program
   .command('ipfs-save <path>')
-  .action(ipfs.saveFile);
+  .action(url => {
+      ipfs.saveFile(url).then(res => {
+        console.log('\nIPFS Address:', res);
+      }).catch(err => {
+        console.log('---', err);
+      });
+  });
 
 program
 	.parse(process.argv);
