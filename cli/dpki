@@ -1,3 +1,5 @@
+#!/usr/bin/env node
+
 var program = require('commander');
 var keyUtils = require('./keys');
 var ipfs = require('./ipfs');
