@@ -8,9 +8,10 @@
   },
   "scripts": {
     "test": "jest",
-    "ganache": "ganache-cli  -m 'candy maple cake sugar pudding cream honey rich smooth crumble sweet treat'",
-    "ipfs": "ipfs daemon",
-    "dev": "concurrently --kill-others \"npm run ganache\" \"npm run ipfs\""
+    "all-tests": "jest && truffle test",
+    "ipfs-node": "node ipfs-node.js",
+    "ganache-node": "node ganache-node.js",
+    "daemons": "concurrently 'npm run ipfs-node' 'npm run ganache-node'"
   },
   "jest": {
     "rootDir": "cli/test"
@@ -20,6 +21,8 @@
   "dependencies": {
     "commander": "^2.15.1",
     "fs": "0.0.1-security",
+    "ganache-cli": "^6.1.8",
+    "ipfs": "^0.32.0",
     "ipfs-api": "^22.0.1",
     "truffle-contract": "^3.0.5",
     "web3": "^1.0.0-beta.34"
