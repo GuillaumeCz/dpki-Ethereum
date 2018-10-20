@@ -30,8 +30,12 @@ truffle migrate
 - `./cli/dpki ipfs-save <filePath> `: Add a specified file to the ipfs network, returns the newly created ipfs-address
 - `./cli/dpki ipfs-cat <ipfs-addr>`: Get the value of file stored at <ipfs-address> on IPFS
 ##### Ethereum
-- `./cli/dpki new <name> <fileOrIpfsId>`: Save into Ethereum the association between the given `<name>` and `<fileOrIpfsId>`. Has an option (-f) to specify if it has to store a file into IPFS before interacting with Ethereum.
+- `./cli/dpki new <name> <ipfsId>`: Save into Ethereum the association between the given `<name>` and `<fileOrIpfsId>`. Has an option (-f) to specify if it has to store a file into IPFS before interacting with Ethereum.
+  - `./cli/dpki new -f <name> <filePath>`: Save into Ethereum the association between the given `<name>` and `<fileOrIpfsId>`. Has an option (-f) to specify if it has to store a file into IPFS before interacting with Ethereum.
 -`./cli/dpki key <name>`: Get the IPFS address of the public key file of the user `<name`.
+
+###### Trust system (on dev)
+- `./cli/dpki trust-him <name>`: Trust the user
 
 #### Tests
 - `npm run test`: nodeJs tests
