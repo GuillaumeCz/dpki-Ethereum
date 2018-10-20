@@ -3,6 +3,7 @@
 var program = require('commander');
 var keyUtils = require('./keys');
 var ipfs = require('./ipfs');
+var trust = require('./trust');
 
 program
 	.version('0.1.0')
@@ -14,20 +15,18 @@ program
 	.command('new-key <_name> <file>').alias('new')
   .option('-f, --file', 'Explicit file path, not ipfs id')
 	.action((_name, file, options) => {
-    keyUtils.newKeyAddress(_name, file, options).then(res => {
-        console.log('New Association <name> -> <ipfs_address', _name, res)
-    }).catch(err => {console.log(err)})
+    keyUtils.newKeyAddress(_name, file, options)
+      .then(res => console.log(`New Association <name> -> <ipfs_address> ${_name} -> ${res}`))
+      .catch(err => console.log('-0-', err));
   });
 
 // Get the ipfs key address of a name
 program
 	.command('key-of <_name>').alias('key')
 	.action(name => {
-    keyUtils.keyAddressOf(name).then(res => {
-        console.log('IPFS Address', res);
-    }).catch(err => {
-        console.log('---', err);
-    });
+    keyUtils.keyAddressOf(name)
+      .then(res => console.log('IPFS Address', res))
+      .catch(err => console.log('--', err));
   });
 
 /**  IPFS  */
@@ -36,23 +35,32 @@ program
 program
   .command('ipfs-cat <id>')
   .action(ipfs_addr => {
-      ipfs.cat(ipfs_addr).then(res => {
-          console.log('\nValue: ', res)
-      }).catch(err => {
-          console.log('---', err)
-      });
+    ipfs.cat(ipfs_addr)
+      .then(res => console.log('\nValue: ', res))
+      .catch(err => console.log('---', err));
   });
 
 // Save a file in ipfs
 program
   .command('ipfs-save <path>')
   .action(url => {
-      ipfs.saveFile(url).then(res => {
-        console.log('\nIPFS Address:', res);
-      }).catch(err => {
-        console.log('---', err);
-      });
+      ipfs.saveFile(url).then(res => console.log('\nIPFS Address:', res))
+      .catch(err => console.log('----', err));
   });
+
+program
+  .command('trust-him <name>')
+  .action(name => {
+    trust.trustHim(name)
+      .then(() => console.log(`OK ! You trust ${name}`));
+  })
+
+program
+  .command('nbr-trust <name')
+  .action(name => {
+    trust.numberOfTrust(name)
+      .then(nbr => console.log('il y a '+nbr))
+  })
 
 program
 	.parse(process.argv);

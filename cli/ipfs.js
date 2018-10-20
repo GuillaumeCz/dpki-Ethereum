@@ -2,34 +2,28 @@ const ipfsAPI = require('ipfs-api');
 const fs = require('fs');
 
 // connection parameters
-var ipfs = ipfsAPI('localhost', '5001', { protocol: 'http' });
-
-var exports = module.exports = {};
+const ipfs = ipfsAPI('localhost', '5001', { protocol: 'http' });
 
 // Display the value of a file
 // takes an id and returns the plain key
-exports.cat = function(_fileIpfsId) {
-    return new Promise((resolve, reject) => {
-        ipfs.files.cat(_fileIpfsId).then(res => {
-            resolve(res.toString());
-        }).catch(err => {
-            reject(err);
-        });
-    });
-};
+const cat = _fileIpfsId => new Promise((resolve, reject) => 
+  ipfs.files.cat(_fileIpfsId)
+    .then(res => resolve(res.toString()))
+    .catch(err => reject(err)));
 
 // Save a key file in ipfs
 // returns the file's id on ipfs
 // accessible at localhost:8080/ipfs/<id>
-exports.saveFile = function(_filePath) {
-    return new Promise((resolve, reject) => {
-        const data = fs.readFileSync(_filePath);
-        const playload = { path: '/cli/assets/id_rsa.pub', content: data };
-        ipfs.files.add(playload).then(r => {
-            resolve(r[0].hash);
-        }).catch(err => {
-            reject(err);
-        });
-    })
-};
+const saveFile = _filePath => new Promise((resolve, reject) => {
+  fs.readFile(_filePath, (err, data) => {
+    if(err) {
+      reject(err);
+    } 
+    const playload = { path: _filePath, content: data };
+    ipfs.files.add(playload)
+      .then(r => resolve(r[0].hash))
+      .catch(err => reject(_filePath +' -- '+ err));
+  });
+});
 
+module.exports = { saveFile, cat };
